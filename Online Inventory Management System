@@ -1,0 +1,94 @@
+-- Create the database
+CREATE DATABASE OnlineStore;
+
+-- Use the created database
+USE OnlineStore;
+
+-- Create a table for Products
+CREATE TABLE Products (
+    ProductID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Price DECIMAL(8, 2) NOT NULL,
+    Quantity INT NOT NULL
+);
+
+-- Create a table for Customers
+CREATE TABLE Customers (
+    CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    Phone VARCHAR(15)
+);
+
+-- Create a table for Orders
+CREATE TABLE Orders (
+    OrderID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+-- Create a table for OrderDetails
+CREATE TABLE OrderDetails (
+    OrderDetailID INT AUTO_INCREMENT PRIMARY KEY,
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    UnitPrice DECIMAL(8, 2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Insert sample data into Products table
+INSERT INTO Products (Name, Price, Quantity) VALUES
+('T-shirt', 15.99, 50),
+('Jeans', 29.99, 30),
+('Sneakers', 49.99, 40),
+('Backpack', 39.99, 20);
+
+-- Insert sample data into Customers table
+INSERT INTO Customers (Name, Email, Phone) VALUES
+('John Doe', 'john.doe@example.com', '123-456-7890'),
+('Jane Smith', 'jane.smith@example.com', '098-765-4321');
+
+-- Insert sample data into Orders table
+INSERT INTO Orders (CustomerID, OrderDate, TotalAmount) VALUES
+(1, '2023-05-01', 89.95),
+(2, '2023-05-02', 99.98);
+
+-- Insert sample data into OrderDetails table
+INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice) VALUES
+(1, 1, 3, 15.99),
+(1, 3, 1, 49.99),
+(2, 2, 2, 29.99),
+(2, 4, 1, 39.99);
+
+-- Query to view all products
+SELECT * FROM Products;
+
+-- Query to view all customers
+SELECT * FROM Customers;
+
+-- Query to view all orders
+SELECT * FROM Orders;
+
+-- Query to view order details with product information
+SELECT
+    Orders.OrderID,
+    Customers.Name AS CustomerName,
+    Products.Name AS ProductName,
+    OrderDetails.Quantity,
+    OrderDetails.UnitPrice,
+    Orders.OrderDate
+FROM
+    OrderDetails
+JOIN Orders ON OrderDetails.OrderID = Orders.OrderID
+JOIN Products ON OrderDetails.ProductID = Products.ProductID
+JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+-- Query to find total sales
+SELECT
+    SUM(TotalAmount) AS TotalSales
+FROM
+    Orders;
